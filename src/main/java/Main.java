@@ -232,7 +232,7 @@ public class Main {
                     startingInterface("R");
                 }
 
-                System.out.println("Invalid user/pass");
+                //System.out.println("Invalid user/pass");
                 System.out.println("Returning to starting interface");
                 startingInterface("S");
             } else if (type.equalsIgnoreCase("H")) {
@@ -245,7 +245,7 @@ public class Main {
                     startingInterface("H");
                 }
 
-                System.out.println("Invalid user/pass");
+                //System.out.println("Invalid user/pass");
                 System.out.println("Returning to starting interface");
                 startingInterface("S");
             } else {
@@ -405,6 +405,10 @@ public class Main {
             Date av_start = Date.valueOf(reader.readLine());
             System.out.print("Enter the end date for availability (YYYY-MM-DD): ");
             Date av_end = Date.valueOf(reader.readLine());
+
+            float recPrice = hostToolkit(listID);
+            System.out.println("Here at MyBnB, we recommend you charge: " + recPrice + " for your listing.");
+
             System.out.print("Enter the price to book for a single day: ");
             float price = Float.parseFloat(reader.readLine());
             sql = "INSERT INTO availability VALUES (" + listID + ", '" + av_start + "', '" + av_end + "', " + price + ");";
@@ -452,6 +456,33 @@ public class Main {
     }
 
     public static void bookListing(int sin, float latitude, float longitude) { }
+
+    public static float hostToolkit(int listingID) {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        float basePrice = 50.0f;
+        float baseAmenityPrice = 25.0f;
+        int numAmenities = 0;
+
+        try {
+            System.out.println("Calculating potential price for listing...");
+            stmt = conn.createStatement();
+            String sql = "SELECT COUNT(*) as num_amenities FROM listings l JOIN amenities a ON (l.list_id = a.listing_id) WHERE l.list_id = " + listingID + ";";
+            ResultSet res = stmt.executeQuery(sql);
+
+            while (res.next()) {
+                numAmenities = res.getInt("num_amenities");
+            }
+
+            float recPrice = (basePrice + (baseAmenityPrice * numAmenities));
+            return recPrice;
+
+        } catch (Exception e) {
+            System.out.println("Error while calculating price for listing");
+        }
+        return 0;
+    }
 
     /***********************
      *  SEARCHING QUERIES  *
