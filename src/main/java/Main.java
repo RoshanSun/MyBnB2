@@ -1,4 +1,5 @@
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.*;
 import java.util.Scanner;
@@ -39,7 +40,7 @@ public class Main {
         // Starting section of interface
         if(call.equalsIgnoreCase("S")) {
             System.out.println("Starting Interface");
-            System.out.print("Choose an option: 1.Login, 2.Create/Update User, 3.Reports Section: ");
+            System.out.print("Choose an option: 1.Login, 2.Create User, 3.Delete User, 4.Reports Section: ");
             input = reader.nextInt();
             if(input == 1) {
                 System.out.println("Login has been chosen");
@@ -48,6 +49,9 @@ public class Main {
                 System.out.println("Creating user....");
                 createUser();
             } else if (input == 3) {
+                System.out.println("Deleting user....");
+                deleteUser();
+            } else if (input == 4) {
                 System.out.println("Entering Reports Section");
                 System.out.println("Choose one of the following reports to see: ");
                 System.out.println("1. Total Number of Bookings in Specific Date Range By City");
@@ -271,6 +275,31 @@ public class Main {
             startingInterface("S");
         } catch (Exception e) {
             System.out.println("Error occurred while creating new user");
+        }
+    }
+
+    public static void deleteUser() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt = null;
+
+        try {
+            System.out.print("Enter your username to delete your account: ");
+            String user = reader.readLine();
+            System.out.print("Enter your password to confirm deletion: ");
+            String pass = reader.readLine();
+            String sql = "DELETE FROM users WHERE username = '" + user + "' AND pass = '" + pass + "';";
+            stmt.executeUpdate(sql);
+            sql = "DELETE FROM renters WHERE username = '" + user + "' AND pass = '" + pass + "';";
+            stmt.executeUpdate(sql);
+            sql = "DELETE FROM hosts WHERE username = '" + user + "' AND pass = '" + pass + "';";
+            stmt.executeUpdate(sql);
+
+            System.out.println("The user " + user + " has been deleted.");
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while trying to delete a user");
         }
     }
 
