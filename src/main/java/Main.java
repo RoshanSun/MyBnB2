@@ -1,8 +1,11 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.nio.Buffer;
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.Statement;
+import java.util.Scanner;
 
 public class Main {
     private static final String dbClassName = "com.mysql.cj.jdbc.Driver";
@@ -33,15 +36,98 @@ public class Main {
     }
 
     public static void startingInterface(String call) {
-        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Scanner reader = new Scanner(System.in);
+        int input;
 
         // Starting section of interface
         if(call.equalsIgnoreCase("S")) {
             System.out.println("Starting Interface");
+            System.out.print("Choose an option: 1.Login, 2.Create/Update User, 3.Reports Section: ");
+            input = reader.nextInt();
+            if(input == 1) {
+                System.out.println("Login has been chosen");
+                login();
+            } else if (input == 2) {
+                System.out.println("Creating user....");
+                createUser();
+            } else if (input == 3) {
+
+            }
         } else if (call.equalsIgnoreCase("R")) {
             System.out.println("Renting Interface");
         } else if (call.equalsIgnoreCase("H")) {
             System.out.println("Hosting Interface");
+        }
+    }
+
+    public static void login() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.println("Welcome back to MyBnB. Enter the following info:");
+            System.out.print("Are you a Renter (R) or a Host (H)?: ");
+            String type = reader.readLine();
+            System.out.print("Enter your username: ");
+            String user = reader.readLine();
+            System.out.print("Enter your password: ");
+            String pass = reader.readLine();
+
+            stmt = conn.createStatement();
+            String sql;
+
+        } catch (Exception e) {
+
+        }
+    }
+
+    public static void createUser() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Please enter your name: ");
+            String name = reader.readLine();
+            System.out.print("Enter your address (optional): ");
+            String address = reader.readLine();
+            System.out.print("Enter your date of birth (YYYY-MM-DD, must be over 18): ");
+            Date dob = Date.valueOf(reader.readLine());
+            System.out.print("Enter your occupation (optional): ");
+            String occupation = reader.readLine();
+            System.out.print("Enter your SIN number (9 digits, no spaces): ");
+            int sin = Integer.parseInt(reader.readLine());
+            System.out.print("Enter your credit card number: ");
+            long cc_num = Long.parseLong(reader.readLine());
+            System.out.print("Enter a username to login to the system with in the future: ");
+            String username = reader.readLine();
+            System.out.print("Choose a password to login with: ");
+            String pass = reader.readLine();
+
+            System.out.println("Attempting to add user to table");
+            stmt = conn.createStatement();
+            String sql = "INSERT INTO users VALUES(" +
+                    "'" + name + "', '" + address + "', '" + dob + "', '" + occupation + "', " + sin + ", " + cc_num + ", '" + username + "', '" + pass + "');";
+            System.out.println(sql);
+            stmt.executeUpdate(sql);
+
+            System.out.print("Do you want to be a Renter(R) or a Host(H)?: ");
+            String type = reader.readLine();
+            if (type.equals("R")) {
+                sql = "INSERT INTO renters VALUES(" +
+                        "'" + name + "', '" + address + "', '" + dob + "', '" + occupation + "', " + sin + ", " + cc_num + ", '" + username + "', '" + pass + "');";
+                stmt.executeUpdate(sql);
+            } else if (type.equals("H")) {
+                sql = "INSERT INTO hosts VALUES(" +
+                        "'" + name + "', '" + address + "', '" + dob + "', '" + occupation + "', " + sin + ", " + cc_num + ", '" + username + "', '" + pass + "');";
+                stmt.executeUpdate(sql);
+            }
+            System.out.println("Tables have been updated accordingly. Let us proceed.");
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error occurred while creating new user");
         }
     }
 
@@ -268,5 +354,16 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Something went wrong while trying to populate the mybnb2 database");
         }
+    }
+
+    public static Connection getConnection() {
+        try {
+            Class.forName(dbClassName);
+            Connection conn = DriverManager.getConnection(ACTUAL_DATABASE, USER, PASS);
+            return conn;
+        } catch (Exception e) {
+            System.out.println("Couldn't get a connection");
+        }
+        return null;
     }
 }
