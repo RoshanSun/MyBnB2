@@ -77,7 +77,17 @@ public class Main {
                         System.out.println("Error occurred while retrieving dates.");
                     }
                 } else if (input == 2) {
-                    System.out.println("NOT IMPLEMENTED");
+                    try {
+                        System.out.print("Choose a start date (YYYY-MM-dd): ");
+                        Date start = Date.valueOf(readerbf.readLine());
+                        System.out.print("Choose an end date (YYYY-MM-dd): ");
+                        Date end = Date.valueOf(readerbf.readLine());
+
+                        System.out.println("Creating Report 2");
+                        report2(start, end);
+                    } catch (Exception e) {
+                        System.out.println("Error occurred while retrieving dates.");
+                    }
                 } else if (input == 3) {
                     System.out.println("Creating Report 3");
                     report3();
@@ -235,17 +245,16 @@ public class Main {
     /***********************
      *  REPORTING QUERIES  *
      ***********************/
-    /* NOT IMPLEMENTED */
     public static void report1(Date start, Date end) {
         Connection conn = getConnection();
         Statement stmt;
 
         try {
             stmt = conn.createStatement();
-            String sql = "SELECT COUNT(*), l.listing_city FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= '" + start + "' AND b.end_date <= '" + end + "') GROUP BY l.listing_city;";
+            String sql = "SELECT COUNT(*) as num_bookings, l.listing_city FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= '" + start + "' AND b.end_date <= '" + end + "') GROUP BY l.listing_city;";
             ResultSet res = stmt.executeQuery(sql);
             while (res.next()) {
-                System.out.println("User " + res.getInt("l2.user_id") + " holds more than 10% of the listings in " + res.getString("listing_city") + ", " + res.getString("listing_country"));
+                System.out.println("There have been " + res.getInt("num_bookings") + " bookings made in " + res.getString("listing_city") + " between the given dates.");
             }
             res.close();
             stmt.close();
@@ -254,9 +263,25 @@ public class Main {
             System.out.println("Something went wrong while creating Report 1");
         }
     }
+    
+    public static void report2(Date start, Date end) {
+        Connection conn = getConnection();
+        Statement stmt;
 
-    /* NOT IMPLEMENTED */
-    public static void report2(Date start, Date end) {}
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT COUNT(*) as num_bookings, l.postal_code, l.listing_city FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= '" + start + "' AND b.end_date <= '" + end + "') GROUP BY l.postal_code, l.listing_city;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("There have been " + res.getInt("num_bookings") + " bookings made in " + res.getString("postal_code") + ", " + res.getString("listing_city") + " between the given dates.");
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 2");
+        }
+    }
 
     public static void report3() {
         Connection conn = getConnection();
