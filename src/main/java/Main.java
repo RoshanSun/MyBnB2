@@ -382,7 +382,7 @@ public class Main {
             int listID = 0;
 
             while(res.next()) {
-                listID = res.getInt("listID");
+                listID = res.getInt("list_id");
             }
 
             /* IMPLEMENT AVAILABILITY DATES */
@@ -459,7 +459,44 @@ public class Main {
         // LET THEM CHOOSE WHICH ONE TO DELETE
     }
 
-    public static void bookListing(int sin, float latitude, float longitude) { }
+    public static void bookListing(int sin, float latitude, float longitude) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT list_id FROM listings WHERE latitude = " + latitude + " AND longitude = " + longitude + ";";
+            ResultSet rs = stmt.executeQuery(sql);
+            int listID = 0;
+
+            while(rs.next()) {
+                listID = rs.getInt("list_id");
+            }
+
+            System.out.print("Enter the start date of the booking: ");
+            Date startDate = Date.valueOf(reader.readLine());
+            System.out.print("Enter the end date of the booking: ");
+            Date endDate = Date.valueOf(reader.readLine());
+
+            sql = "SELECT av_id FROM availabilities WHERE listing_id = " + listID + " AND av_start <= '" + startDate + "' AND av_end >= '" + endDate + "';";
+            rs = stmt.executeQuery(sql);
+            int avID = 0;
+
+            while (rs.next()) {
+                avID = rs.getInt("av_id");
+            }
+
+            sql = "INSERT INTO bookings VALUES(0, " + avID + ", " + sin + ", '" + startDate + "', '" + endDate + "', 'Available');";
+            stmt.executeUpdate(sql);
+
+            System.out.println("Your booking has been finalized.");
+            System.out.println("Returning to renter interface");
+            startingInterface("R");
+        } catch (Exception e) {
+            System.out.println("Error occurred while booking listing");
+        }
+    }
 
     public static void cancelBookingAsRenter() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
