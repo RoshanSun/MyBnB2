@@ -168,7 +168,8 @@ public class Main {
                 System.out.println("Searching for listings to book...");
                 searchForListings();
             } else if (input == 2) {
-                System.out.println("NOT IMPLEMENTED");
+                System.out.println("Cancelling booking...");
+                cancelBookingAsRenter();
             } else if (input == 3) {
                 System.out.println("Getting ready to leave a comment...");
                 leaveComment();
@@ -196,7 +197,8 @@ public class Main {
             } else if (input == 3) {
                 System.out.println("NOT IMPLEMENTED");
             } else if (input == 4) {
-                System.out.println("NOT IMPLEMENTED");
+                System.out.println("Cancelling booking...");
+                cancelBookingAsHost();
             } else if (input == 5) {
                 System.out.println("Returning to Home Page");
                 startingInterface("S");
@@ -458,6 +460,56 @@ public class Main {
     }
 
     public static void bookListing(int sin, float latitude, float longitude) { }
+
+    public static void cancelBookingAsRenter() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Please enter your SIN to confirm booking cancellation: ");
+            int renterID = Integer.parseInt(reader.readLine());
+            System.out.print("Enter the start date of your booking: ");
+            Date start = Date.valueOf(reader.readLine());
+            System.out.print("Enter the end date of your booking: ");
+            Date end = Date.valueOf(reader.readLine());
+
+            stmt = conn.createStatement();
+            String sql = "UPDATE bookings SET status = 'Renter Cancelled' WHERE renterID = " + renterID + " AND start_date = '" + start + "' AND end_date = '" + end + "';";
+            stmt.executeUpdate(sql);
+
+            System.out.println("Your booking has been cancelled");
+            System.out.println("Returning to renter interface");
+            startingInterface("R");
+        } catch (Exception e) {
+            System.out.println("Error occurred while trying to cancel booking");
+        }
+    }
+
+    public static void cancelBookingAsHost() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Please enter the renter's ID to confirm booking cancellation: ");
+            int renterID = Integer.parseInt(reader.readLine());
+            System.out.print("Enter the start date of your booking: ");
+            Date start = Date.valueOf(reader.readLine());
+            System.out.print("Enter the end date of your booking: ");
+            Date end = Date.valueOf(reader.readLine());
+
+            stmt = conn.createStatement();
+            String sql = "UPDATE bookings SET status = 'Host Cancelled' WHERE renterID = " + renterID + " AND start_date = '" + start + "' AND end_date = '" + end + "';";
+            stmt.executeUpdate(sql);
+
+            System.out.println("This booking has been cancelled");
+            System.out.println("Returning to hot interface");
+            startingInterface("H");
+        } catch (Exception e) {
+            System.out.println("Error occurred while trying to cancel booking");
+        }
+    }
 
     public static void leaveComment() {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
