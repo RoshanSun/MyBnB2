@@ -1,3 +1,5 @@
+import java.io.BufferedReader;
+import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.Statement;
@@ -10,11 +12,37 @@ public class Main {
     private static final String ACTUAL_DATABASE = "jdbc:mysql://localhost:3306/mybnb2";
 
     public static void main(String[] args) {
-        deleteDatabase();
-        initializeDatabase();
-        populateDatabase();
+        //deleteDatabase();
+        //initializeDatabase();
+        //populateDatabase();
         System.out.println("Ok Boss");
 
+        //User Interface
+        System.out.println();
+        System.out.println("*****************************************************	");
+        System.out.println("*---------------------------------------------------*	");
+        System.out.println("*--------------- WELCOME TO MyBnB ------------------*	");
+        System.out.println("*---------------------------------------------------*	");
+        System.out.println("*****************************************************	");
+        System.out.println();
+        System.out.println("Rent unique accommodations from local hosts all over the world!");
+        System.out.println("Feel at home anywhere you go in the world with MyBnB.");
+
+        startingInterface("S");
+
+    }
+
+    public static void startingInterface(String call) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        // Starting section of interface
+        if(call.equalsIgnoreCase("S")) {
+            System.out.println("Starting Interface");
+        } else if (call.equalsIgnoreCase("R")) {
+            System.out.println("Renting Interface");
+        } else if (call.equalsIgnoreCase("H")) {
+            System.out.println("Hosting Interface");
+        }
     }
 
     public static void initializeDatabase() {

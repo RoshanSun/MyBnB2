@@ -30,8 +30,8 @@ By this, I mean you'll have to change the path location to where you have stored
 Once this is done, you should be able to run the project either on the IDE by simply running the main method in Main.java....
 OR
 You can use your terminal, cd to the directory in which the pom.xml file is found and do the following:
-mvn clean
-mvn compile
+mvn clean,
+mvn compile,
 mvn exec:java -Dexec.mainClass=Main
 
 This cleans and newly compiles the Maven project and runs the main function in the Main.java class. Thank you!
