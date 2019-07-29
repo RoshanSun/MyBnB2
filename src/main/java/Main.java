@@ -32,11 +32,11 @@ public class Main {
             stmt = conn.createStatement();
             String sql = "CREATE DATABASE IF NOT EXISTS MyBnB2";
             stmt.executeUpdate(sql);
-            System.out.println("MyBnB database has been created");
+            System.out.println("MyBnB2 database has been created");
             stmt.close();
             conn.close();
 
-            System.out.println("Connecting to MyBnB database");
+            System.out.println("Connecting to MyBnB2 database");
             conn = DriverManager.getConnection(ACTUAL_DATABASE, USER, PASS);
             System.out.println("Connected");
 
@@ -197,38 +197,39 @@ public class Main {
 
     public static void populateDatabase() {
         String addon = "?allowLoadLocalInfile=true";
+        String baseFileLocation = "C://Users/Roshan Suntharan/Desktop/C43/MyBnB/";
         Connection conn;
         Statement stmt;
 
         try {
             Class.forName(dbClassName);
-            System.out.println("Connecting to MyBnB database");
+            System.out.println("Connecting to MyBnB2 database");
             conn = DriverManager.getConnection(ACTUAL_DATABASE + addon, USER, PASS);
             System.out.println("Connected");
 
             stmt = conn.createStatement();
-            String sql = "LOAD DATA LOCAL INFILE 'C://Users/Roshan Suntharan/Desktop/C43/MyBnB/users.csv' into TABLE users " +
+            String sql = "LOAD DATA LOCAL INFILE '" + baseFileLocation + "users.csv' into TABLE users " +
                     "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
             stmt.executeUpdate(sql);
             System.out.println("Populated users table with data");
 
-            sql = "LOAD DATA LOCAL INFILE 'C://Users/Roshan Suntharan/Desktop/C43/MyBnB/hosts.csv' into TABLE hosts " +
+            sql = "LOAD DATA LOCAL INFILE '" + baseFileLocation + "hosts.csv' into TABLE hosts " +
                     "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
             stmt.executeUpdate(sql);
             System.out.println("Populated hosts table with data");
 
-            sql = "LOAD DATA LOCAL INFILE 'C://Users/Roshan Suntharan/Desktop/C43/MyBnB/renters.csv' into TABLE renters " +
+            sql = "LOAD DATA LOCAL INFILE '" + baseFileLocation + "renters.csv' into TABLE renters " +
                     "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
             stmt.executeUpdate(sql);
             System.out.println("Populated renters table with data");
 
-            sql = "LOAD DATA LOCAL INFILE 'C://Users/Roshan Suntharan/Desktop/C43/MyBnB/listings.csv' into TABLE listings " +
+            sql = "LOAD DATA LOCAL INFILE '" + baseFileLocation + "listings.csv' into TABLE listings " +
                     "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
             stmt.executeUpdate(sql);
             System.out.println("Populated listings table with data");
 
             /* FOR SOME REASON THIS LOADS UP EMPTY CELLS FOR THE AMENITIES */
-            sql = "LOAD DATA LOCAL INFILE 'C://Users/Roshan Suntharan/Desktop/C43/MyBnB/amenities.csv' into TABLE amenities " +
+            sql = "LOAD DATA LOCAL INFILE '" + baseFileLocation + "amenities.csv' into TABLE amenities " +
                     "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
             stmt.executeUpdate(sql);
             System.out.println("Populated amenities table with data");
@@ -237,7 +238,7 @@ public class Main {
             conn.close();
 
         } catch (Exception e) {
-            System.out.println("Something went wrong while trying to populate the mybnb database");
+            System.out.println("Something went wrong while trying to populate the mybnb2 database");
         }
     }
 }
