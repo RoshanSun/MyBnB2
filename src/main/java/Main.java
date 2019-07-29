@@ -141,9 +141,13 @@ public class Main {
                         System.out.println("Error occurred while retrieving dates.");
                     }
                 } else if (input == 11) {
-                    System.out.println("NOT IMPLEMENTED");
+                    System.out.println("Creating Report 11");
+                    report11();
+                    startingInterface("S");
                 } else if (input == 12) {
-                    System.out.println("NOT IMPLEMENTED");
+                    System.out.println("Creating Report 12");
+                    report12();
+                    startingInterface("S");
                 } else if (input == 13) {
                     System.out.println("NOT IMPLEMENTED");
                 }
@@ -460,11 +464,43 @@ public class Main {
         }
     }
 
-    /* NOT IMPLEMENTED */
-    public static void report11() { }
+    public static void report11() {
+        Connection conn = getConnection();
+        Statement stmt;
 
-    /* NOT IMPLEMENTED */
-    public static void report12() { }
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT user_id, MAX(num_cancellations) as cancels FROM (SELECT user_id, COUNT(*) as num_cancellations FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= DATE_SUB(DATE(sysdate()), INTERVAL 1 YEAR) AND b.status='Host Cancelled') GROUP BY user_id) cancellations GROUP BY user_id;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Host with id" + res.getInt("user_id") + " has made " + res.getInt("cancels") + " cancellations in the past year");
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 11");
+        }
+    }
+
+    public static void report12() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT renter_id, MAX(num_cancellations) as cancels FROM(SELECT renter_id, COUNT(*) as num_cancellations FROM bookings b WHERE (b.start_date >= DATE_SUB(DATE(sysdate()), INTERVAL 1 YEAR) AND b.status='Renter Cancelled') GROUP BY renter_id) cancellations GROUP BY renter_id;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Renter with id" + res.getInt("renter_id") + " has made " + res.getInt("cancels") + " cancellations in the past year");
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 11");
+        }
+    }
 
     /* NOT IMPLEMENTED */
     public static void report13() { }
