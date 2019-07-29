@@ -1,6 +1,5 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
-import java.nio.Buffer;
 import java.sql.*;
 import java.util.Scanner;
 
@@ -12,9 +11,9 @@ public class Main {
     private static final String ACTUAL_DATABASE = "jdbc:mysql://localhost:3306/mybnb2";
 
     public static void main(String[] args) {
-        deleteDatabase();
-        initializeDatabase();
-        populateDatabase();
+        //deleteDatabase();
+        //initializeDatabase();
+        //populateDatabase();
         System.out.println("Ok Boss");
 
         //User Interface
@@ -33,6 +32,7 @@ public class Main {
     }
 
     public static void startingInterface(String call) {
+        BufferedReader readerbf = new BufferedReader(new InputStreamReader(System.in));
         Scanner reader = new Scanner(System.in);
         int input;
 
@@ -65,7 +65,17 @@ public class Main {
                 System.out.println("13. Most Popular Noun Phrases Associated with each Listing");
                 input = reader.nextInt();
                 if (input == 1) {
-                    System.out.println("NOT IMPLEMENTED");
+                    try {
+                        System.out.print("Choose a start date (YYYY-MM-dd): ");
+                        Date start = Date.valueOf(readerbf.readLine());
+                        System.out.print("Choose an end date (YYYY-MM-dd): ");
+                        Date end = Date.valueOf(readerbf.readLine());
+
+                        System.out.println("Creating Report 1");
+                        report1(start, end);
+                    } catch (Exception e) {
+                        System.out.println("Error occurred while retrieving dates.");
+                    }
                 } else if (input == 2) {
                     System.out.println("NOT IMPLEMENTED");
                 } else if (input == 3) {
@@ -228,10 +238,18 @@ public class Main {
     /* NOT IMPLEMENTED */
     public static void report1(Date start, Date end) {
         Connection conn = getConnection();
-        Statement stmt = null;
+        Statement stmt;
 
         try {
-            String sql = "SELECT ";
+            stmt = conn.createStatement();
+            String sql = "SELECT COUNT(*), l.listing_city FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= '" + start + "' AND b.end_date <= '" + end + "') GROUP BY l.listing_city;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("User " + res.getInt("l2.user_id") + " holds more than 10% of the listings in " + res.getString("listing_city") + ", " + res.getString("listing_country"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
         } catch (Exception e) {
             System.out.println("Something went wrong while creating Report 1");
         }
