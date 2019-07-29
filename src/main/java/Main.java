@@ -12,9 +12,9 @@ public class Main {
     private static final String ACTUAL_DATABASE = "jdbc:mysql://localhost:3306/mybnb2";
 
     public static void main(String[] args) {
-        //deleteDatabase();
-        //initializeDatabase();
-        //populateDatabase();
+        deleteDatabase();
+        initializeDatabase();
+        populateDatabase();
         System.out.println("Ok Boss");
 
         //User Interface
@@ -28,7 +28,7 @@ public class Main {
         System.out.println("Rent unique accommodations from local hosts all over the world!");
         System.out.println("Feel at home anywhere you go in the world with MyBnB.");
 
-        startingInterface("S");
+        //startingInterface("S");
 
     }
 
@@ -458,16 +458,17 @@ public class Main {
             stmt.executeUpdate(sql);
             System.out.println("Created amenities table");
 
-            sql = "CREATE TABLE IF NOT EXISTS availability(" +
+            sql = "CREATE TABLE IF NOT EXISTS availabilities(" +
                     "av_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
                     "listing_id INT NOT NULL," +
                     "av_start DATE NOT NULL," +
                     "av_end DATE NOT NULL," +
                     "listing_price DECIMAL(10, 2) NOT NULL," +
                     "FOREIGN KEY(listing_id) REFERENCES listings(list_id) ON DELETE CASCADE," +
+                    "UNIQUE(listing_id, av_start, av_end)," +
                     "CHECK(listing_price >= 0), CHECK(av_start <= av_end));";
             stmt.executeUpdate(sql);
-            System.out.println("Created availability table");
+            System.out.println("Created availabilities table");
 
             sql = "CREATE TABLE IF NOT EXISTS bookings(" +
                     "booking_id INT NOT NULL AUTO_INCREMENT PRIMARY KEY," +
@@ -476,7 +477,7 @@ public class Main {
                     "start_date DATE NOT NULL," +
                     "end_date DATE NOT NULL," +
                     "status ENUM('Available', 'Renter Cancelled', 'Host Cancelled')," +
-                    "FOREIGN KEY(availability_id) REFERENCES availability(av_id) ON DELETE CASCADE," +
+                    "FOREIGN KEY(availability_id) REFERENCES availabilities(av_id) ON DELETE CASCADE," +
                     "FOREIGN KEY(renter_id) REFERENCES users(sin) ON DELETE CASCADE," +
                     "CHECK(start_date <= end_date));";
             stmt.executeUpdate(sql);
@@ -556,7 +557,7 @@ public class Main {
 
     public static void populateDatabase() {
         String addon = "?allowLoadLocalInfile=true";
-        String baseFileLocation = "C://Users/Roshan Suntharan/Desktop/C43/MyBnB/";
+        String baseFileLocation = "C://Users/Roshan Suntharan/Desktop/C43/RealOne/MyBnB2/";
         Connection conn;
         Statement stmt;
 
@@ -592,6 +593,14 @@ public class Main {
                     "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
             stmt.executeUpdate(sql);
             System.out.println("Populated amenities table with data");
+
+            /*
+            sql = "LOAD DATA LOCAL INFILE '" + baseFileLocation + "availabilities.csv' into TABLE availabilities " +
+                    "FIELDS TERMINATED BY ',' LINES TERMINATED BY '\n'";
+            System.out.println(sql);
+            stmt.executeUpdate(sql);
+            System.out.println("Populated availabilities table with data");
+            */
 
             stmt.close();
             conn.close();
