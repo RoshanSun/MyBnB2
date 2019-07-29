@@ -12,9 +12,9 @@ public class Main {
     private static final String ACTUAL_DATABASE = "jdbc:mysql://localhost:3306/mybnb2";
 
     public static void main(String[] args) {
-        //deleteDatabase();
-        //initializeDatabase();
-        //populateDatabase();
+        deleteDatabase();
+        initializeDatabase();
+        populateDatabase();
         System.out.println("Ok Boss");
 
         //User Interface
