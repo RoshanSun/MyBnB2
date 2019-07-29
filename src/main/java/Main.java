@@ -157,8 +157,12 @@ public class Main {
             }
         } else if (call.equalsIgnoreCase("R")) {
             System.out.println("Renting Interface");
+            System.out.print("Choose an option: 1.Book Listing, 2.Cancel Booking, 3.Leave a comment, 4.Leave a Rating, 5.Return to Home Page: ");
+            input = reader.nextInt();
         } else if (call.equalsIgnoreCase("H")) {
             System.out.println("Hosting Interface");
+            System.out.print("Choose an option: 1.Create Listing, 2.Delete Listing, 3.Adjust Listing, 4.Cancel Booking, 5.Return to Home Page: ");
+            input = reader.nextInt();
         }
     }
 
@@ -267,6 +271,245 @@ public class Main {
             startingInterface("S");
         } catch (Exception e) {
             System.out.println("Error occurred while creating new user");
+        }
+    }
+
+    public static void bookListing(int sin, float latitude, float longitude) { }
+
+    /***********************
+     *  SEARCHING QUERIES  *
+     ***********************/
+    public static void searchForListings() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        try {
+            System.out.print("Enter your SIN number to begin booking: ");
+            int sin = Integer.parseInt(reader.readLine());
+
+            System.out.println("Let's begin booking");
+            System.out.print("Choose a filter to search by: 1.Location, 2.Price, 3.Postal Code, 4.Address 5.Return to Home Menu: ");
+            int ans = Integer.parseInt(reader.readLine());
+            if (ans == 1) {
+                System.out.print("Enter the latitude you desire (-90 to 90): ");
+                float latitude = Float.parseFloat(reader.readLine());
+                System.out.print("Enter the longitude you desire (-180 to 180): ");
+                float longitude = Float.parseFloat(reader.readLine());
+                float distance = 0.1f;
+                System.out.print("Would you like to enter a distance to consider (Y/N)?: ");
+                String response = reader.readLine();
+                if(response.equals("Y")) {
+                    System.out.print("Enter a distance to consider: ");
+                    distance = Float.parseFloat(reader.readLine());
+                }
+                System.out.println("Attempting to filter by Latitude and Longitude (default distance: 0.1)");
+                searchForListingsByLocation(sin, latitude, longitude, distance);
+            } else if (ans == 2) {
+                System.out.print("Enter a rental price you are considering: ");
+                float price = Float.parseFloat(reader.readLine());
+                float offset = 50f;
+                System.out.print("Would you like to enter a price offset to consider (Y/N)?: ");
+                String response = reader.readLine();
+                if(response.equals("Y")) {
+                    System.out.print("Enter the offset to consider: ");
+                    offset = Float.parseFloat(reader.readLine());
+                }
+                System.out.println("Attempting to filter by Price (default price offset: $50)");
+                searchForListingsByPrice(sin, price, offset);
+            } else if (ans == 3) {
+                System.out.print("Enter the postal code in which you are looking for: ");
+                String postal_code = reader.readLine();
+                System.out.println("Attempting to filter by Postal Code");
+                searchForListingsByPostalCode(sin, postal_code);
+            } else if (ans == 4) {
+                System.out.print("Enter the address at which you are looking for: ");
+                String address = reader.readLine();
+                System.out.println("Attempting to filter by Address");
+                searchForListingsByAddress(sin, address);
+            } else if (ans == 5) {
+                startingInterface("S");
+            } else {
+                System.out.println("Invalid choice");
+                searchForListings();
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong while searching");
+        }
+    }
+
+    /* NOT FULLY IMPLEMENTED - STILL NEED TO BOOK CHOSEN LISTING */
+    public static void searchForListingsByLocation(int sin, float latitude, float longitude, float distance) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT l.*, a.listing_price FROM listings l JOIN availabilities a ON (l.list_id = a.listing_id)" +
+                    "WHERE (latitude >= (" + latitude + " - " + distance + ") AND latitude <= (" + latitude + " + " + distance + "))" +
+                    "AND (longitude >= (" + longitude + " - " + distance + ") AND longitude <= (" + longitude + " + " + distance + "))" +
+                    "ORDER BY ABS(latitude - " + latitude + ");";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Type: " + res.getString("type"));
+                System.out.println("Latitude: " + res.getFloat("latitude"));
+                System.out.println("Longitude: " + res.getFloat("longitude"));
+                System.out.println("Address: " + res.getString("listing_address") + ", " + res.getString("listing_city") + ", " +
+                        "" + res.getString("listing_country") + " " + res.getString("postal_code"));
+                System.out.println("Amenities: " + res.getString("amenities")); // change this to use amenities table when possible
+                System.out.println("Daily Price: " + res.getString("listing_price"));
+                System.out.println();
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+
+            System.out.println();
+            System.out.print("Are you interested in any of these listings (Y/N)?: ");
+            String response = reader.readLine();
+            if(response.equals("Y")) {
+                System.out.print("Enter the latitude of the listing: ");
+                float uLat = Float.parseFloat(reader.readLine());
+                System.out.print("Enter the longitude of the listing: ");
+                float uLong = Float.parseFloat(reader.readLine());
+                bookListing(sin, uLat, uLong);
+            } else {
+                System.out.println("Returning to Search Menu");
+                searchForListings();
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 3");
+        }
+    }
+
+    /* NOT FULLY IMPLEMENTED - STILL NEED TO BOOK CHOSEN LISTING */
+    public static void searchForListingsByPrice(int sin, float price, float offset) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT l.*, a.listing_price FROM listings l JOIN availabilities a ON (l.list_id = a.listing_id)" +
+                    "WHERE (listing_price >= (" + price + " - " + offset + ") AND listing_price <= (" + price + " + " + offset + ")" +
+                    "ORDER BY listing_price ASC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Type: " + res.getString("type"));
+                System.out.println("Latitude: " + res.getFloat("latitude"));
+                System.out.println("Longitude: " + res.getFloat("longitude"));
+                System.out.println("Address: " + res.getString("listing_address") + ", " + res.getString("listing_city") + ", " +
+                        "" + res.getString("listing_country") + " " + res.getString("postal_code"));
+                System.out.println("Amenities: " + res.getString("amenities")); // change this to use amenities table when possible
+                System.out.println("Daily Price: " + res.getString("listing_price"));
+                System.out.println();
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+
+            System.out.println();
+            System.out.print("Are you interested in any of these listings (Y/N)?: ");
+            String response = reader.readLine();
+            if(response.equals("Y")) {
+                System.out.print("Enter the latitude of the listing: ");
+                float uLat = Float.parseFloat(reader.readLine());
+                System.out.print("Enter the longitude of the listing: ");
+                float uLong = Float.parseFloat(reader.readLine());
+                bookListing(sin, uLat, uLong);
+            } else {
+                System.out.println("Returning to Search Menu");
+                searchForListings();
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating searching for listings by price");
+        }
+    }
+
+    /* NOT FULLY IMPLEMENTED - STILL NEED TO BOOK CHOSEN LISTING */
+    public static void searchForListingsByPostalCode(int sin, String postal_code) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT l.*, a.listing_price FROM listings l JOIN availabilities a ON (l.list_id = a.listing_id)" +
+                    "WHERE (postal_code = '" + postal_code + "')" +
+                    "ORDER BY listing_price ASC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Type: " + res.getString("type"));
+                System.out.println("Latitude: " + res.getFloat("latitude"));
+                System.out.println("Longitude: " + res.getFloat("longitude"));
+                System.out.println("Address: " + res.getString("listing_address") + ", " + res.getString("listing_city") + ", " +
+                        "" + res.getString("listing_country") + " " + res.getString("postal_code"));
+                System.out.println("Amenities: " + res.getString("amenities")); // change this to use amenities table when possible
+                System.out.println("Daily Price: " + res.getString("listing_price"));
+                System.out.println();
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+
+            System.out.println();
+            System.out.print("Are you interested in any of these listings (Y/N)?: ");
+            String response = reader.readLine();
+            if(response.equals("Y")) {
+                System.out.print("Enter the latitude of the listing: ");
+                float uLat = Float.parseFloat(reader.readLine());
+                System.out.print("Enter the longitude of the listing: ");
+                float uLong = Float.parseFloat(reader.readLine());
+                bookListing(sin, uLat, uLong);
+            } else {
+                System.out.println("Returning to Search Menu");
+                searchForListings();
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating searching for listings by price");
+        }
+    }
+
+    /* NOT FULLY IMPLEMENTED - STILL NEED TO BOOK CHOSEN LISTING */
+    public static void searchForListingsByAddress(int sin, String address) {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT l.*, a.listing_price FROM listings l JOIN availabilities a ON (l.list_id = a.listing_id)" +
+                    "WHERE (listing_address = '" + address + "')" +
+                    "ORDER BY listing_price ASC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Type: " + res.getString("type"));
+                System.out.println("Latitude: " + res.getFloat("latitude"));
+                System.out.println("Longitude: " + res.getFloat("longitude"));
+                System.out.println("Address: " + res.getString("listing_address") + ", " + res.getString("listing_city") + ", " +
+                        "" + res.getString("listing_country") + " " + res.getString("postal_code"));
+                System.out.println("Amenities: " + res.getString("amenities")); // change this to use amenities table when possible
+                System.out.println("Daily Price: " + res.getString("listing_price"));
+                System.out.println();
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+
+            System.out.println();
+            System.out.print("Are you interested in any of these listings (Y/N)?: ");
+            String response = reader.readLine();
+            if(response.equals("Y")) {
+                System.out.print("Enter the latitude of the listing: ");
+                float uLat = Float.parseFloat(reader.readLine());
+                System.out.print("Enter the longitude of the listing: ");
+                float uLong = Float.parseFloat(reader.readLine());
+                bookListing(sin, uLat, uLong);
+            } else {
+                System.out.println("Returning to Search Menu");
+                searchForListings();
+            }
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating searching for listings by price");
         }
     }
 
