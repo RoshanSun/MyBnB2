@@ -170,9 +170,11 @@ public class Main {
             } else if (input == 2) {
                 System.out.println("NOT IMPLEMENTED");
             } else if (input == 3) {
-                System.out.println("NOT IMPLEMENTED");
+                System.out.println("Getting ready to leave a comment...");
+                leaveComment();
             } else if (input == 4) {
-                System.out.println("NOT IMPLEMENTED");
+                System.out.println("Getting ready to leave a rating...");
+                leaveRating();
             } else if (input == 5) {
                 System.out.println("Returning to Home Page");
                 startingInterface("S");
@@ -456,6 +458,162 @@ public class Main {
     }
 
     public static void bookListing(int sin, float latitude, float longitude) { }
+
+    public static void leaveComment() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        try {
+            System.out.print("Do you want to leave a comment on another User(U) or a Listing(L)?: ");
+            String choice = reader.readLine();
+
+            if(choice.equalsIgnoreCase("U")) {
+                System.out.println("Preparing comment for a user...");
+                leaveProfileComment();
+            } else if(choice.equalsIgnoreCase("L")) {
+                System.out.println("Preparing comment for a listing...");
+                leaveListingComment();
+            } else {
+                System.out.println("Invalid choice, returning to renter's interface");
+                startingInterface("R");
+            }
+        } catch (Exception e) {
+            System.out.println("Error occurred while leaving comment");
+        }
+    }
+
+    public static void leaveListingComment() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Enter the id of the listing you'd like to leave a comment for: ");
+            int listingID = Integer.parseInt(reader.readLine());
+            System.out.print("Enter your id/SIN number: ");
+            int commenterID = Integer.parseInt(reader.readLine());
+            System.out.print("Now, write the comment you'd like to leave on the listing: ");
+            String content = reader.readLine();
+
+            stmt = conn.createStatement();
+            String sql = "INSERT INTO listing_comments VALUES(" + listingID + ", " + commenterID + ", '" + content + "');";
+            stmt.executeUpdate(sql);
+
+            System.out.println("Thank you for your feedback. Your comment has been recorded.");
+            stmt.close();
+            conn.close();
+
+            System.out.println("Returning to renter interface");
+            startingInterface("R");
+        } catch (Exception e) {
+            System.out.println("Error occurred while trying to leave a comment");
+        }
+    }
+
+    public static void leaveProfileComment() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Enter the id of the user you'd like to leave a comment for: ");
+            int userID = Integer.parseInt(reader.readLine());
+            System.out.print("Enter your id/SIN number: ");
+            int commenterID = Integer.parseInt(reader.readLine());
+            System.out.print("Now, write the comment you'd like to leave on their profile: ");
+            String content = reader.readLine();
+
+            stmt = conn.createStatement();
+            String sql = "INSERT INTO profile_comments VALUES(" + userID + ", " + commenterID + ", '" + content + "');";
+            stmt.executeUpdate(sql);
+
+            System.out.println("Thank you for your feedback. Your comment has been recorded.");
+            stmt.close();
+            conn.close();
+
+            System.out.println("Returning to renter interface");
+            startingInterface("R");
+        } catch (Exception e) {
+            System.out.println("Error occurred while trying to leave a comment");
+        }
+    }
+
+    public static void leaveRating() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+
+        try {
+            System.out.print("Do you want to leave a rating on another User(U) or a Listing(L)?: ");
+            String choice = reader.readLine();
+
+            if(choice.equalsIgnoreCase("U")) {
+                System.out.println("Preparing rating for a user...");
+                leaveProfileRating();
+            } else if(choice.equalsIgnoreCase("L")) {
+                System.out.println("Preparing rating for a listing...");
+                leaveListingRating();
+            } else {
+                System.out.println("Invalid choice, returning to renter's interface");
+                startingInterface("R");
+            }
+        } catch (Exception e) {
+            System.out.println("Error occurred while leaving rating");
+        }
+    }
+
+    public static void leaveListingRating() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Enter the id of the listing you'd like to leave a rating for: ");
+            int listingID = Integer.parseInt(reader.readLine());
+            System.out.print("Enter your id/SIN number: ");
+            int raterID = Integer.parseInt(reader.readLine());
+            System.out.print("Now, choose the rating you'd like to leave on the listing (1-5): ");
+            int rating = Integer.parseInt(reader.readLine());
+
+            stmt = conn.createStatement();
+            String sql = "INSERT INTO listing_ratings VALUES(" + listingID + ", " + raterID + ", " + rating + ");";
+            stmt.executeUpdate(sql);
+
+            System.out.println("Thank you for your feedback. Your rating has been recorded.");
+            stmt.close();
+            conn.close();
+
+            System.out.println("Returning to renter interface");
+            startingInterface("R");
+        } catch (Exception e) {
+            System.out.println("Error occurred while trying to leave a rating");
+        }
+    }
+
+    public static void leaveProfileRating() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            System.out.print("Enter the id of the user you'd like to leave a rating for: ");
+            int userID = Integer.parseInt(reader.readLine());
+            System.out.print("Enter your id/SIN number: ");
+            int raterID = Integer.parseInt(reader.readLine());
+            System.out.print("Now, choose the rating you'd like to leave on the user's profile (1-5): ");
+            int rating = Integer.parseInt(reader.readLine());
+
+            stmt = conn.createStatement();
+            String sql = "INSERT INTO profile_ratings VALUES(" + userID + ", " + raterID + ", '" + rating + "');";
+            stmt.executeUpdate(sql);
+
+            System.out.println("Thank you for your feedback. Your rating has been recorded.");
+            stmt.close();
+            conn.close();
+
+            System.out.println("Returning to renter interface");
+            startingInterface("R");
+        } catch (Exception e) {
+            System.out.println("Error occurred while trying to leave a rating");
+        }
+    }
 
     public static float hostToolkit(int listingID) {
         Connection conn = getConnection();
