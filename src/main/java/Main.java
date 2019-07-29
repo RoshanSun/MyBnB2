@@ -48,7 +48,64 @@ public class Main {
                 System.out.println("Creating user....");
                 createUser();
             } else if (input == 3) {
-
+                System.out.println("Entering Reports Section");
+                System.out.println("Choose one of the following reports to see: ");
+                System.out.println("1. Total Number of Bookings in Specific Date Range By City");
+                System.out.println("2. Total Number of Bookings in Specific Date Range By Zip Code in City");
+                System.out.println("3. Total Number of Listings Per Country");
+                System.out.println("4. Total Number of Listings Per Country, City");
+                System.out.println("5. Total Number of Listings Per Country, City, Postal Code");
+                System.out.println("6. Rank Hosts by Total Number of Listings Overall Per Country");
+                System.out.println("7. Rank Hosts by Total Number of Listings Overall Per City");
+                System.out.println("8. Provide Hosts with >10% listings in each City, Country");
+                System.out.println("9. Rank Renters by Number of Bookings in Specific Time Period");
+                System.out.println("10. Rank Renters by Number of Bookings in Specific Time Period, City (>=2 in year)");
+                System.out.println("11. Hosts with Most Cancellations in a Year");
+                System.out.println("12. Renters with Most Cancellations in a Year");
+                System.out.println("13. Most Popular Noun Phrases Associated with each Listing");
+                input = reader.nextInt();
+                if (input == 1) {
+                    System.out.println("NOT IMPLEMENTED");
+                } else if (input == 2) {
+                    System.out.println("NOT IMPLEMENTED");
+                } else if (input == 3) {
+                    System.out.println("Creating Report 3");
+                    report3();
+                    startingInterface("S");
+                } else if (input == 4) {
+                    System.out.println("Creating Report 4");
+                    report4();
+                    startingInterface("S");
+                } else if (input == 5) {
+                    System.out.println("Creating Report 5");
+                    report5();
+                    startingInterface("S");
+                } else if (input == 6) {
+                    System.out.println("Creating Report 6");
+                    report6();
+                    startingInterface("S");
+                } else if (input == 7) {
+                    System.out.println("Creating Report 7");
+                    report7();
+                    startingInterface("S");
+                } else if (input == 8) {
+                    System.out.println("Creating Report 8");
+                    report8();
+                    startingInterface("S");
+                } else if (input == 9) {
+                    System.out.println("NOT IMPLEMENTED");
+                } else if (input == 10) {
+                    System.out.println("NOT IMPLEMENTED");
+                } else if (input == 11) {
+                    System.out.println("NOT IMPLEMENTED");
+                } else if (input == 12) {
+                    System.out.println("NOT IMPLEMENTED");
+                } else if (input == 13) {
+                    System.out.println("NOT IMPLEMENTED");
+                }
+            } else {
+                System.out.println("Invalid choice");
+                startingInterface("S");
             }
         } else if (call.equalsIgnoreCase("R")) {
             System.out.println("Renting Interface");
@@ -165,6 +222,160 @@ public class Main {
         }
     }
 
+    /***********************
+     *  REPORTING QUERIES  *
+     ***********************/
+    /* NOT IMPLEMENTED */
+    public static void report1(Date start, Date end) {
+        Connection conn = getConnection();
+        Statement stmt = null;
+
+        try {
+            String sql = "SELECT ";
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 1");
+        }
+    }
+
+    /* NOT IMPLEMENTED */
+    public static void report2(Date start, Date end) {}
+
+    public static void report3() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT listing_country, COUNT(*) as num_listings FROM listings GROUP BY listing_country;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("There are " + res.getInt("num_listings") + " listings in " + res.getString("listing_country"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 3");
+        }
+    }
+
+    public static void report4() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT listing_city, listing_country, COUNT(*) as num_listings FROM listings GROUP BY listing_city, listing_country;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("There are " + res.getInt("num_listings") + " listings in " + res.getString("listing_city") + ", " + res.getString("listing_country"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 3");
+        }
+    }
+
+    public static void report5() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT listing_city, listing_country, postal_code, COUNT(*) as num_listings FROM listings GROUP BY listing_city, listing_country, postal_code;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("There are " + res.getInt("num_listings") + " listings in " + res.getString("listing_city") + ", " + res.getString("listing_country") + " at " + res.getString("postal_code"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 3");
+        }
+    }
+
+    /* MIGHT WANT TO CHANGE TO SHOW NAME INSTEAD OF SIN */
+    public static void report6() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT user_id, listing_country, COUNT(*) as num_listings FROM listings GROUP BY user_id, listing_country ORDER BY num_listings DESC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("User " + res.getInt("user_id") + " has " + res.getInt("num_listings") + " listings in " + res.getString("listing_country"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 6");
+        }
+    }
+
+    /* MIGHT WANT TO CHANGE TO SHOW NAME INSTEAD OF SIN */
+    public static void report7() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT user_id, listing_city, listing_country, COUNT(*) as num_listings FROM listings GROUP BY user_id, listing_city, listing_country ORDER BY num_listings DESC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("User " + res.getInt("user_id") + " has " + res.getInt("num_listings") + " listings in " + res.getString("listing_city") + ", " + res.getString("listing_country"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 3");
+        }
+    }
+
+    /* MIGHT WANT TO CHANGE TO SHOW NAME INSTEAD OF SIN */
+    public static void report8() {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT l2.user_id, l2.listing_city, l2.listing_country FROM ( SELECT listing_city, listing_country, COUNT(*) as total_listings FROM listings GROUP BY listing_city, listing_country) l1 JOIN ( SELECT user_id, listing_city, listing_country, COUNT(*) AS user_listings FROM listings GROUP BY user_id, listing_city, listing_country) l2 USING (listing_city, listing_country) WHERE user_listings > (total_listings * 0.1);";
+
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("User " + res.getInt("l2.user_id") + " holds more than 10% of the listings in " + res.getString("listing_city") + ", " + res.getString("listing_country"));
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 8");
+        }
+    }
+
+    /* NOT IMPLEMENTED */
+    public static void report9() { }
+
+    /* NOT IMPLEMENTED */
+    public static void report10() { }
+
+    /* NOT IMPLEMENTED */
+    public static void report11() { }
+
+    /* NOT IMPLEMENTED */
+    public static void report12() { }
+
+    /* NOT IMPLEMENTED */
+    public static void report13() { }
+
+    /*********************************
+     *  DATABASE MANAGING FUNCTIONS  *
+     *********************************/
     public static void initializeDatabase() {
         Connection conn;
         Statement stmt;
