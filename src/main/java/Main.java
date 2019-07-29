@@ -27,7 +27,7 @@ public class Main {
         System.out.println("Rent unique accommodations from local hosts all over the world!");
         System.out.println("Feel at home anywhere you go in the world with MyBnB.");
 
-        //startingInterface("S");
+        startingInterface("S");
 
     }
 
@@ -73,6 +73,7 @@ public class Main {
 
                         System.out.println("Creating Report 1");
                         report1(start, end);
+                        startingInterface("S");
                     } catch (Exception e) {
                         System.out.println("Error occurred while retrieving dates.");
                     }
@@ -85,6 +86,7 @@ public class Main {
 
                         System.out.println("Creating Report 2");
                         report2(start, end);
+                        startingInterface("S");
                     } catch (Exception e) {
                         System.out.println("Error occurred while retrieving dates.");
                     }
@@ -113,9 +115,31 @@ public class Main {
                     report8();
                     startingInterface("S");
                 } else if (input == 9) {
-                    System.out.println("NOT IMPLEMENTED");
+                    try {
+                        System.out.print("Choose a start date (YYYY-MM-dd): ");
+                        Date start = Date.valueOf(readerbf.readLine());
+                        System.out.print("Choose an end date (YYYY-MM-dd): ");
+                        Date end = Date.valueOf(readerbf.readLine());
+
+                        System.out.println("Creating Report 9");
+                        report9(start, end);
+                        startingInterface("S");
+                    } catch (Exception e) {
+                        System.out.println("Error occurred while retrieving dates.");
+                    }
                 } else if (input == 10) {
-                    System.out.println("NOT IMPLEMENTED");
+                    try {
+                        System.out.print("Choose a start date (YYYY-MM-dd): ");
+                        Date start = Date.valueOf(readerbf.readLine());
+                        System.out.print("Choose an end date (YYYY-MM-dd): ");
+                        Date end = Date.valueOf(readerbf.readLine());
+
+                        System.out.println("Creating Report 10");
+                        report10(start, end);
+                        startingInterface("S");
+                    } catch (Exception e) {
+                        System.out.println("Error occurred while retrieving dates.");
+                    }
                 } else if (input == 11) {
                     System.out.println("NOT IMPLEMENTED");
                 } else if (input == 12) {
@@ -263,7 +287,7 @@ public class Main {
             System.out.println("Something went wrong while creating Report 1");
         }
     }
-    
+
     public static void report2(Date start, Date end) {
         Connection conn = getConnection();
         Statement stmt;
@@ -340,7 +364,6 @@ public class Main {
         }
     }
 
-    /* MIGHT WANT TO CHANGE TO SHOW NAME INSTEAD OF SIN */
     public static void report6() {
         Connection conn = getConnection();
         Statement stmt;
@@ -360,7 +383,6 @@ public class Main {
         }
     }
 
-    /* MIGHT WANT TO CHANGE TO SHOW NAME INSTEAD OF SIN */
     public static void report7() {
         Connection conn = getConnection();
         Statement stmt;
@@ -380,7 +402,6 @@ public class Main {
         }
     }
 
-    /* MIGHT WANT TO CHANGE TO SHOW NAME INSTEAD OF SIN */
     public static void report8() {
         Connection conn = getConnection();
         Statement stmt;
@@ -401,11 +422,43 @@ public class Main {
         }
     }
 
-    /* NOT IMPLEMENTED */
-    public static void report9() { }
+    public static void report9(Date start, Date end) {
+        Connection conn = getConnection();
+        Statement stmt;
 
-    /* NOT IMPLEMENTED */
-    public static void report10() { }
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT renter_id, COUNT(*) as num_bookings FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= '" + start + "' AND b.end_date <= '" + end + "') GROUP BY renter_id ORDER BY num_bookings ASC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Renter with id " + res.getInt("renter_id") + " has made " + res.getInt("num_bookings") + " bookings in the time period");
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 9");
+        }
+    }
+
+    public static void report10(Date start, Date end) {
+        Connection conn = getConnection();
+        Statement stmt;
+
+        try {
+            stmt = conn.createStatement();
+            String sql = "SELECT renter_id, COUNT(*) as num_bookings, listing_city FROM listings l JOIN availabilities a ON l.list_id = a.listing_id JOIN bookings b ON a.av_id = b.booking_id WHERE (b.start_date >= '" + start + "' AND b.end_date <= '" + end + "') GROUP BY renter_id, listing_city ORDER BY num_bookings ASC;";
+            ResultSet res = stmt.executeQuery(sql);
+            while (res.next()) {
+                System.out.println("Renter with id " + res.getInt("renter_id") + " has made " + res.getInt("num_bookings") + " bookings in " + res.getString("listing_city") + " in the time period");
+            }
+            res.close();
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while creating Report 10");
+        }
+    }
 
     /* NOT IMPLEMENTED */
     public static void report11() { }
