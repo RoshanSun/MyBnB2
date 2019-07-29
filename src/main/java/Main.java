@@ -196,6 +196,7 @@ public class Main {
                 deleteListing();
             } else if (input == 3) {
                 System.out.println("NOT IMPLEMENTED");
+                adjustExistingListing();
             } else if (input == 4) {
                 System.out.println("Cancelling booking...");
                 cancelBookingAsHost();
@@ -458,6 +459,8 @@ public class Main {
         // CREATE A QUERY TO RETURN ALL LISTINGS THAT THIS HOST HAS?
         // LET THEM CHOOSE WHICH ONE TO DELETE
     }
+
+    public static void adjustExistingListing() {}
 
     public static void bookListing(int sin, float latitude, float longitude) {
         BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
