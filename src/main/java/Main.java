@@ -163,10 +163,45 @@ public class Main {
             System.out.println("Renting Interface");
             System.out.print("Choose an option: 1.Book Listing, 2.Cancel Booking, 3.Leave a comment, 4.Leave a Rating, 5.Return to Home Page: ");
             input = reader.nextInt();
+
+            if(input == 1) {
+                System.out.println("Searching for listings to book...");
+                searchForListings();
+            } else if (input == 2) {
+                System.out.println("NOT IMPLEMENTED");
+            } else if (input == 3) {
+                System.out.println("NOT IMPLEMENTED");
+            } else if (input == 4) {
+                System.out.println("NOT IMPLEMENTED");
+            } else if (input == 5) {
+                System.out.println("Returning to Home Page");
+                startingInterface("S");
+            } else {
+                System.out.println("Invalid choice");
+                startingInterface("R");
+            }
         } else if (call.equalsIgnoreCase("H")) {
             System.out.println("Hosting Interface");
             System.out.print("Choose an option: 1.Create Listing, 2.Delete Listing, 3.Adjust Listing, 4.Cancel Booking, 5.Return to Home Page: ");
             input = reader.nextInt();
+
+            if(input == 1) {
+                System.out.println("Creating listing...");
+                createListing();
+            } else if (input == 2) {
+                System.out.println("Deleting listing...");
+                deleteListing();
+            } else if (input == 3) {
+                System.out.println("NOT IMPLEMENTED");
+            } else if (input == 4) {
+                System.out.println("NOT IMPLEMENTED");
+            } else if (input == 5) {
+                System.out.println("Returning to Home Page");
+                startingInterface("S");
+            } else {
+                System.out.println("Invalid Choice");
+                startingInterface("H");
+            }
         }
     }
 
@@ -301,6 +336,119 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Something went wrong while trying to delete a user");
         }
+    }
+
+    public static void createListing() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt = null;
+
+        try {
+            System.out.print("Please enter your SIN number as on profile: ");
+            int sin = Integer.parseInt(reader.readLine());
+            System.out.print("Enter the listing type (Apartment, House, Townhouse, Villa, Tent, " +
+                    "Condominium, Bungalow, Cottage, Loft, Lighthouse, " +
+                    "Dormitory, Castle, Boat, RV, Other): ");
+            String type = reader.readLine();
+            System.out.print("Enter the latitude of the location: ");
+            float latitude = Float.parseFloat(reader.readLine());
+            System.out.print("Enter the longitude of the location: ");
+            float longitude = Float.parseFloat(reader.readLine());
+            System.out.print("Enter the listing address: ");
+            String address = reader.readLine();
+            System.out.print("Enter the listing city: ");
+            String city = reader.readLine();
+            System.out.print("Enter the listing country: ");
+            String country = reader.readLine();
+            System.out.print("Enter the listing's postal code: ");
+            String postal_code = reader.readLine();
+            System.out.print("Enter all amenities the listing offers (separated by commas): ");
+            String amenities = reader.readLine();
+
+            System.out.println("Attempting to insert user record into table");
+            stmt = conn.createStatement();
+            String sql = "INSERT INTO listings VALUES(" +
+                    "" + sin + ", " + 0 + ", '" + type + "', " + latitude + ", " + longitude + ", '" + address + "', '" + city + "', '" + country + "', '" + postal_code + "', '" + amenities + "');";
+            System.out.println(sql);
+            stmt.executeUpdate(sql);
+
+            // Get the generated listID for this listing
+            sql = "SELECT list_id FROM listings WHERE user_id = " + sin + " AND latitude = " + latitude + " AND longitude = " + longitude + ";";
+            ResultSet res = stmt.executeQuery(sql);
+            int listID = 0;
+
+            while(res.next()) {
+                listID = res.getInt("listID");
+            }
+
+            /* IMPLEMENT AVAILABILITY DATES */
+            System.out.print("Would you like to add an amenity (Y/N)?: ");
+            String input;
+            String answer;
+            while((input = reader.readLine()).equals("Y")){
+                System.out.print("Enter one of the following amenities (Kitchen, Internet, TV, Essentials, Heating, " +
+                        "Air Conditioning, Washer, Dryer, Free Parking, Wireless, " +
+                        "Breakfast, Pets, Family Friendly, Suitable for Events, " +
+                        "Smoking, Wheelchair Accessible, Elevator, Fireplace, Buzzer, " +
+                        "Doorman, Pool, Hot Tub, Gym, 24 Hours Check-In, Hangers, " +
+                        "Iron, Hair Dryer, Laptop-friendly Workspace, " +
+                        "Carbon Monoxide Detector, First Aid Kit, Smoke Detector): ");
+                answer = reader.readLine();
+
+                sql = "INSERT INTO amenities VALUES(" + listID + ", '" + answer + "');";
+                stmt.executeUpdate(sql);
+                System.out.println("Amenity has been added");
+                System.out.print("Would you like to add another amenity (Y/N)?: ");
+            }
+
+            System.out.print("Enter the start date for availability (YYYY-MM-DD): ");
+            Date av_start = Date.valueOf(reader.readLine());
+            System.out.print("Enter the end date for availability (YYYY-MM-DD): ");
+            Date av_end = Date.valueOf(reader.readLine());
+            System.out.print("Enter the price to book for a single day: ");
+            float price = Float.parseFloat(reader.readLine());
+            sql = "INSERT INTO availability VALUES (" + listID + ", '" + av_start + "', '" + av_end + "', " + price + ");";
+            stmt.executeUpdate(sql);
+            System.out.println("Availability created");
+
+            stmt.close();
+            conn.close();
+
+            System.out.print("The listing has been created! Write 'S' to go to home page, or 'H' to enter Host Menu: ");
+            String reply = reader.readLine();
+            startingInterface(reply);
+        } catch (IOException e) {
+            System.out.println("Something went wrong while getting input to create listing");
+        } catch (SQLException e) {
+            System.out.println("Something went wrong while trying to create Listing record");
+        }
+    }
+
+    public static void deleteListing() {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+        Connection conn = getConnection();
+        Statement stmt = null;
+
+        try {
+            System.out.print("Enter your SIN number as on profile: ");
+            int sin = Integer.parseInt(reader.readLine());
+            System.out.print("Enter the latitude of the listing to delete: ");
+            float latitude = Float.parseFloat(reader.readLine());
+            System.out.print("Enter the longitutde of the listing to delete: ");
+            float longitude = Float.parseFloat(reader.readLine());
+
+            String sql = "DELETE FROM listings WHERE user_id = " + sin + " AND latitude = " + latitude + " AND longitude = " + longitude + ";";
+            stmt.executeUpdate(sql);
+
+            System.out.println("The listing owned by " + sin + " at latitude " + latitude + " and longitude " + longitude + " has been deleted.");
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Something went wrong while trying to delete listing");
+        }
+
+        // CREATE A QUERY TO RETURN ALL LISTINGS THAT THIS HOST HAS?
+        // LET THEM CHOOSE WHICH ONE TO DELETE
     }
 
     public static void bookListing(int sin, float latitude, float longitude) { }
