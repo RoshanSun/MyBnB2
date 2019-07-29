@@ -1,10 +1,7 @@
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.nio.Buffer;
-import java.sql.Connection;
-import java.sql.Date;
-import java.sql.DriverManager;
-import java.sql.Statement;
+import java.sql.*;
 import java.util.Scanner;
 
 public class Main {
@@ -77,8 +74,42 @@ public class Main {
             stmt = conn.createStatement();
             String sql;
 
-        } catch (Exception e) {
+            if(type.equalsIgnoreCase("R")) {
+                sql = "SELECT * FROM renters WHERE username = '" + user + "' AND pass = '" + pass + "';";
+                ResultSet rs = stmt.executeQuery(sql);
 
+                while (rs.next()) {
+                    System.out.println("Welcome back to MyBnB " + rs.getString("username"));
+                    System.out.println("Renter successfully logged in");
+                    startingInterface("R");
+                }
+
+                System.out.println("Invalid user/pass");
+                System.out.println("Returning to starting interface");
+                startingInterface("S");
+            } else if (type.equalsIgnoreCase("H")) {
+                sql = "SELECT * FROM hosts WHERE username = '" + user + "' AND pass = '" + pass + "';";
+                ResultSet res = stmt.executeQuery(sql);
+
+                while (res.next()) {
+                    System.out.println("Welcome back to MyBnB " + res.getString("username"));
+                    System.out.println("Host successfully logged in");
+                    startingInterface("H");
+                }
+
+                System.out.println("Invalid user/pass");
+                System.out.println("Returning to starting interface");
+                startingInterface("S");
+            } else {
+                System.out.println("Invalid user type");
+                System.out.println("Returning to starting interface");
+                startingInterface("S");
+            }
+
+            stmt.close();
+            conn.close();
+        } catch (Exception e) {
+            System.out.println("Error while logging in");
         }
     }
 
@@ -114,11 +145,11 @@ public class Main {
 
             System.out.print("Do you want to be a Renter(R) or a Host(H)?: ");
             String type = reader.readLine();
-            if (type.equals("R")) {
+            if (type.equalsIgnoreCase("R")) {
                 sql = "INSERT INTO renters VALUES(" +
                         "'" + name + "', '" + address + "', '" + dob + "', '" + occupation + "', " + sin + ", " + cc_num + ", '" + username + "', '" + pass + "');";
                 stmt.executeUpdate(sql);
-            } else if (type.equals("H")) {
+            } else if (type.equalsIgnoreCase("H")) {
                 sql = "INSERT INTO hosts VALUES(" +
                         "'" + name + "', '" + address + "', '" + dob + "', '" + occupation + "', " + sin + ", " + cc_num + ", '" + username + "', '" + pass + "');";
                 stmt.executeUpdate(sql);
@@ -126,6 +157,9 @@ public class Main {
             System.out.println("Tables have been updated accordingly. Let us proceed.");
             stmt.close();
             conn.close();
+
+            System.out.println("Returning to starting interface");
+            startingInterface("S");
         } catch (Exception e) {
             System.out.println("Error occurred while creating new user");
         }
